@@ -9,7 +9,7 @@ So intuitive your grandparents can use it. So optimized it works offline. So sim
 
 Pocket Pillbox was created for the [Web Warriors Hackathon](https://vanillawebhack.com/), the ultimate 72-hour battle of constraint-driven creativity.
 
-We chose the following tracks and **fully satisfied all three**:
+I chose the following tracks and **fully satisfied all three**:
 
 | Track Challenge           | Our Implementation                                                                 |
 |---------------------------|-------------------------------------------------------------------------------------|
@@ -27,24 +27,15 @@ We chose the following tracks and **fully satisfied all three**:
 - ✅ **Works offline once loaded** — even from a USB stick
 - ✅ **Automatic pop-up notifications** at scheduled med times (see below!)
 
-## ⭐ Why This Project Stands Out
+## 📸 Screenshots & Demo
 
-### 🎯 Pure Constraint-Based Engineering
+A quick look at the app in action.
 
-- 🧱 **1 File**  
-  Everything lives inside a single `.html` file — no separate CSS, JS, images, or fonts
+[![Pocket Pillbox Demo Video](https://img.youtube.com/vi/zBlla5-ISh4/0.jpg)](https://youtu.be/zBlla5-ISh4)
+> *Click the thumbnail above to watch the full demo video on YouTube.*
 
-- ⚡ **Zero Dependencies**  
-  Built with only **vanilla HTML, CSS, and JavaScript** — no frameworks, no build tools
-
-- 💾 **Data Stays Private**  
-  All reminders stored in `localStorage`. Never leaves your device.
-
-- 📶 **Offline-First**  
-  Works even if you're disconnected after the first load — no service workers needed
-
-- **🔔 Built-in Reminder Notifications:** Get browser pop-up reminders for your medications, right on time!
-(Requires notification permission and that the app remains open in a browser tab.)
+![Screenshot of the Pocket Pillbox application interface](image.png)
+> *The main user interface, showing the medication form and the list of reminders.*
 
 ## 🏆 How We Meet Our Chosen Tracks
 
@@ -171,8 +162,8 @@ Pocket Pillbox isn’t just a hackathon demo — it's a real, usable tool for:
 
 ## 📝 Try It Now
 
-👉 [**Open Pocket Pillbox**](./index.html)  
-📁 Or [**download this repo**](https://github.com/your-repo-url) and double-click `index.html` to get started.
+👉 [**Open Pocket Pillbox**](https://sanjaysah101.github.io/pocket-pillbox/)  
+📁 Or [**download this repo**](https://github.com/sanjaysah101/pocket-pillbox) and double-click `index.html` to get started.
 
 ## 🙌 Credits & Acknowledgements
 
@@ -181,7 +172,6 @@ Proudly coded in raw HTML, CSS, and JavaScript. No frameworks. No fluff.
 
 ### Contact / Feedback  
 
-- [Discord](https://discord.gg/sanjaysah101)  
 - [X](https://x.com/_sanjaysah)
 - [LinkedIn](https://linkedin.com/in/sanjaysah101)
 
@@ -194,8 +184,3 @@ Proudly coded in raw HTML, CSS, and JavaScript. No frameworks. No fluff.
 | ✅ Performance       | Instant load, no network fetches after initial   |
 | ✅ Creativity        | Practical, elegant UI built for a real audience  |
 | ✅ Technical Purity  | 1 HTML file. No JS frameworks. No CDNs.          |
-
-> *Thank you for supporting a more inclusive, accessible, and performant web.*
->
-> 🛡️ *Survived the Web. Without Frameworks. With Honor.*  
-> — **Pocket Pillbox**, your offline-friendly, elder-ready medication tracker.
