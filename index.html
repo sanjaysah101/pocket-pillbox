@@ -349,7 +349,99 @@
 
         renderReminders();
 
-        // --- Form Submission (Add/Update) ---
+        // -- 🛎️ Notification Logic --
+
+        // 1. Ask for permission on load
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+
+        // 2. Helper to send notification
+        function sendReminderNotification(reminder) {
+            if (Notification.permission === "granted") {
+                new Notification("Medication Reminder", {
+                    body: `Time to take: ${reminder.name}` + (reminder.dosage ? ` (${reminder.dosage})` : "") + (reminder.time ? ` at ${reminder.time}` : "")
+                });
+            }
+        }
+
+        // 3. Check if current time matches reminder time (within 1 minute tolerance)
+        function isTimeDue(reminder) {
+            if (!reminder.time) return false;
+            const now = new Date();
+            const nowHHMM = now.toTimeString().slice(0, 5);
+            // For safety, allow a 1-minute window
+            const [h, m] = reminder.time.split(':').map(Number);
+            return (
+                now.getHours() === h &&
+                Math.abs(now.getMinutes() - m) < 1
+            );
+        }
+
+        // 4. Extended Reminder Model to support notifiedToday
+        function migrateRemindersForNotifications(reminders) {
+            let updated = false;
+            reminders.forEach(reminder => {
+                if (reminder.notifiedToday === undefined) {
+                    reminder.notifiedToday = false;
+                    updated = true;
+                }
+            });
+            return updated;
+        }
+        // Migrate upon load
+        if (migrateRemindersForNotifications(reminders)) {
+            saveReminders();
+        }
+
+        // 5. Reminder polling
+        function checkRemindersForNotification() {
+            let changed = false;
+            reminders.forEach(reminder => {
+                if (
+                    !reminder.taken &&
+                    !reminder.notifiedToday &&
+                    isTimeDue(reminder)
+                ) {
+                    sendReminderNotification(reminder);
+                    reminder.notifiedToday = true;
+                    changed = true;
+                }
+            });
+            if (changed) saveReminders();
+        }
+        // Poll every 60 seconds
+        setInterval(checkRemindersForNotification, 1000);
+
+        // 6. Reset notifiedToday at midnight
+        function scheduleMidnightReset() {
+            const now = new Date();
+            const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1, 0) - now;
+            setTimeout(() => {
+                reminders.forEach(rem => rem.notifiedToday = false);
+                saveReminders();
+                scheduleMidnightReset();
+            }, msUntilMidnight);
+        }
+        scheduleMidnightReset();
+
+        // 7. When creating a new reminder, attach notifiedToday: false
+        // (Already in local code, but let's ensure updates are future-proofed)
+        function addReminderWithNotificationFlag(name, dosage, time) {
+            const reminder = {
+                id: Date.now(),
+                name,
+                dosage,
+                time,
+                taken: false,
+                notifiedToday: false
+            };
+            reminders.push(reminder);
+            saveReminders();
+            renderReminders();
+        }
+
+        // Patch form submit to use this function
         FORM.addEventListener('submit', function (e) {
             e.preventDefault();
             const name = NAME.value.trim();
@@ -362,6 +454,7 @@
                     rem.dosage = DOSAGE.value.trim();
                     rem.time = TIME.value;
                     // Keep "taken" state as is
+                    rem.notifiedToday = false; // reset notification for edited reminder
                     saveReminders();
                     renderReminders();
                 }
@@ -371,16 +464,11 @@
                 ADD_BTN.textContent = 'Add Reminder';
             } else {
                 // --- Add new reminder ---
-                const reminder = {
-                    id: Date.now(),
+                addReminderWithNotificationFlag(
                     name,
-                    dosage: DOSAGE.value.trim(),
-                    time: TIME.value,
-                    taken: false
-                };
-                reminders.push(reminder);
-                saveReminders();
-                renderReminders();
+                    DOSAGE.value.trim(),
+                    TIME.value
+                );
             }
             FORM.reset();
             NAME.focus();
