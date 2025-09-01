@@ -522,34 +522,6 @@
             });
         }
 
-        // --- Service Worker: Full Offline Experience ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Inline service worker for single-file hackathon!
-                const SW_CODE = `
-          const CACHE_NAME = 'pillbox-offline-v1';
-          self.addEventListener('install', event => {
-            event.waitUntil(
-              caches.open(CACHE_NAME).then(cache => cache.addAll([
-                location.pathname
-              ]))
-            );
-            self.skipWaiting();
-          });
-          self.addEventListener('fetch', event => {
-            event.respondWith(
-              caches.match(event.request).then(response => (
-                response || fetch(event.request)
-              ))
-            );
-          });
-        `;
-                const blob = new Blob([SW_CODE], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl);
-            });
-        }
-
         // --- Dark mode toggle ---
         const DARK_BTN = document.getElementById('toggle-dark');
         function setDark(state) {
