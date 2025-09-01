@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pocket Pillbox</title>
+    <title>Pocket Pillbox – Offline Med Reminder</title>
     <style>
-        /* Reset */
         html {
             box-sizing: border-box;
             font-size: 18px;
@@ -27,6 +26,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: inherit;
+            transition: background 0.3s, color 0.3s;
         }
 
         header {
@@ -43,7 +44,7 @@
             max-width: 440px;
             background: #fff;
             border-radius: 1rem;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
             padding: 1.5rem 1.2rem 2.5rem 1.2rem;
             margin-bottom: 2rem;
         }
@@ -64,6 +65,7 @@
             font-weight: bold;
             color: #036ba2;
             font-size: 1.12em;
+            transition: color 0.2s;
         }
 
         label {
@@ -72,8 +74,8 @@
             font-size: 1em;
         }
 
-        input[type='text'],
-        input[type='time'] {
+        input[type="text"],
+        input[type="time"] {
             font-size: 1em;
             padding: 0.4em 0.6em;
             margin-left: 0.6em;
@@ -82,7 +84,7 @@
             outline: none;
             width: 74%;
             max-width: 210px;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.2s;
             background: #f6fcff;
         }
 
@@ -175,6 +177,52 @@
             margin-left: 0.6em;
         }
 
+        .edit-pill-btn,
+        .delete-pill-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #036ba2;
+            padding: 0.2em 0.4em;
+            margin: 0 0.2em;
+            font-size: 1em;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .edit-pill-btn:hover,
+        .delete-pill-btn:hover {
+            color: #FF9800;
+            background: #e5f4ff;
+            border-radius: 0.3em;
+        }
+
+        .delete-pill-btn {
+            color: #b11414;
+        }
+
+        .delete-pill-btn:hover {
+            color: #fff;
+            background: #d42323;
+        }
+
+        #toggle-dark {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.05em;
+            background: #222;
+            color: #fff;
+            border-radius: 0.7em;
+            border: none;
+            padding: 0.48em 0.75em;
+            cursor: pointer;
+            transition: background 0.16s, color 0.18s;
+        }
+
+        #toggle-dark:hover {
+            background: #333;
+        }
+
         @media (max-width: 600px) {
             main {
                 padding: 1.1rem 0.5rem 1.8rem 0.5rem;
@@ -183,8 +231,13 @@
             html {
                 font-size: 16px;
             }
+
+            #toggle-dark {
+                right: 0.65rem;
+            }
         }
 
+        /* --- Dark Mode --- */
         body.dark {
             background: #20262b;
             color: #eee;
@@ -244,43 +297,37 @@
         <h1>🩺 Pocket Pillbox</h1>
     </header>
 
-    <button id="toggle-dark" aria-label="Switch to dark mode"
-        style="position:absolute;top:1.5rem;right:1.5rem;font-size:1.05em;background:#222;">🌙</button>
-
-    <main id="app-container">
-        <!-- ADD REMINDER FORM -->
-        <form id="pill-form" autocomplete="off" aria-label="Add a daily medication reminder">
+    <button id="toggle-dark" aria-label="Switch to dark mode" title="Toggle dark mode">🌙</button>
+    <main>
+        <form id="pill-form" autocomplete="off">
             <fieldset>
                 <legend>💊 Add Medication</legend>
                 <label>
                     Name:
-                    <input type="text" id="pill-name" required maxlength="32" autocomplete="off"
-                        aria-label="Pill name" />
+                    <input type="text" id="pill-name" maxlength="50" required autocomplete="off" aria-label="Pill name">
                 </label>
                 <label>
                     Dosage:
-                    <input type="text" id="pill-dosage" maxlength="16" placeholder="e.g. 5mg" aria-label="Dosage" />
+                    <input type="text" id="pill-dosage" maxlength="20" autocomplete="off" aria-label="Dosage">
                 </label>
                 <label>
                     Time:
-                    <input type="time" id="pill-time" aria-label="Time to take" />
+                    <input type="time" id="pill-time" aria-label="Time">
                 </label>
-                <button type="submit" id="add-btn">Add Reminder</button>
+                <button id="add-btn" type="submit" style="margin-top:0.7em;">
+                    Add Reminder
+                </button>
             </fieldset>
         </form>
 
-        <!-- REMINDERS LIST -->
         <section id="reminders-section" aria-label="Today’s medications">
             <h2>Today’s Medications</h2>
-            <ul id="reminders-list">
-                <!-- JavaScript will populate reminders here -->
-            </ul>
+            <ul id="reminders-list"></ul>
             <button id="clear-all" type="button" aria-label="Clear all reminders">
-                Clear All Reminders
+                Clear All
             </button>
         </section>
     </main>
-
     <script>
         // --- Pocket Pillbox Core Logic ---
         const FORM = document.getElementById('pill-form');
@@ -289,32 +336,52 @@
         const TIME = document.getElementById('pill-time');
         const LIST = document.getElementById('reminders-list');
         const CLEAR = document.getElementById('clear-all');
+        // For edit button text change and state
+        const ADD_BTN = document.getElementById('add-btn');
+        const LEGEND = FORM.querySelector('legend');
 
         // Use a unique key to avoid conflict in localStorage
         const STORAGE_KEY = 'pocket-pillbox-reminders-v1';
 
         // Reminder format: { id, name, dosage, time, taken }
-
         let reminders = loadReminders();
+        let editId = null; // if not null, we're editing
+
         renderReminders();
 
-        // --- Form Submission ---
+        // --- Form Submission (Add/Update) ---
         FORM.addEventListener('submit', function (e) {
             e.preventDefault();
             const name = NAME.value.trim();
             if (!name) return;
-
-            const reminder = {
-                id: Date.now(), // unique key
-                name,
-                dosage: DOSAGE.value.trim(),
-                time: TIME.value,
-                taken: false,
-            };
-
-            reminders.push(reminder);
-            saveReminders();
-            renderReminders();
+            if (editId !== null) {
+                // --- Update existing reminder ---
+                const rem = reminders.find(r => r.id === editId);
+                if (rem) {
+                    rem.name = name;
+                    rem.dosage = DOSAGE.value.trim();
+                    rem.time = TIME.value;
+                    // Keep "taken" state as is
+                    saveReminders();
+                    renderReminders();
+                }
+                // Reset editing state
+                editId = null;
+                LEGEND.textContent = '💊 Add Medication';
+                ADD_BTN.textContent = 'Add Reminder';
+            } else {
+                // --- Add new reminder ---
+                const reminder = {
+                    id: Date.now(),
+                    name,
+                    dosage: DOSAGE.value.trim(),
+                    time: TIME.value,
+                    taken: false
+                };
+                reminders.push(reminder);
+                saveReminders();
+                renderReminders();
+            }
             FORM.reset();
             NAME.focus();
         });
@@ -323,11 +390,45 @@
         LIST.addEventListener('change', function (e) {
             if (e.target.classList.contains('reminder-checkbox')) {
                 const id = Number(e.target.dataset.id);
-                const found = reminders.find((r) => r.id === id);
+                const found = reminders.find(r => r.id === id);
                 if (found) {
                     found.taken = e.target.checked;
                     saveReminders();
                     renderReminders();
+                }
+            }
+        });
+
+        // --- Delete & Edit Buttons ---
+        LIST.addEventListener('click', function (e) {
+            // --- Delete ---
+            if (e.target.classList.contains('delete-pill-btn')) {
+                const id = Number(e.target.dataset.id);
+                if (confirm('Delete this reminder?')) {
+                    reminders = reminders.filter(r => r.id !== id);
+                    saveReminders();
+                    renderReminders();
+                }
+                // Reset edit mode if we're deleting the one being edited
+                if (editId === id) {
+                    editId = null;
+                    FORM.reset();
+                    LEGEND.textContent = '💊 Add Medication';
+                    ADD_BTN.textContent = 'Add Reminder';
+                }
+            }
+            // --- Edit ---
+            else if (e.target.classList.contains('edit-pill-btn')) {
+                const id = Number(e.target.dataset.id);
+                const toEdit = reminders.find(r => r.id === id);
+                if (toEdit) {
+                    NAME.value = toEdit.name;
+                    DOSAGE.value = toEdit.dosage || '';
+                    TIME.value = toEdit.time || '';
+                    editId = id;
+                    LEGEND.textContent = '✏️ Edit Medication';
+                    ADD_BTN.textContent = 'Update Reminder';
+                    NAME.focus();
                 }
             }
         });
@@ -339,31 +440,42 @@
                 saveReminders();
                 renderReminders();
             }
+            // Also reset edit mode, if active
+            editId = null;
+            FORM.reset();
+            LEGEND.textContent = '💊 Add Medication';
+            ADD_BTN.textContent = 'Add Reminder';
         });
 
-        // --- Load from LocalStorage ---
+        // --- ESC to cancel editing ---
+        FORM.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && editId !== null) {
+                editId = null;
+                FORM.reset();
+                LEGEND.textContent = '💊 Add Medication';
+                ADD_BTN.textContent = 'Add Reminder';
+                NAME.focus();
+            }
+        });
+
+        // --- LocalStorage Helpers ---
         function loadReminders() {
             try {
                 return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            } catch {
-                return [];
-            }
+            } catch { return []; }
         }
-
-        // --- Save to LocalStorage ---
         function saveReminders() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(reminders));
         }
 
-        // --- Render Reminders List ---
+        // --- Render Reminders ---
         function renderReminders() {
             LIST.innerHTML = '';
             if (reminders.length === 0) {
-                LIST.innerHTML =
-                    '<li style="color:#888; font-size:1em;">No reminders set yet.</li>';
+                LIST.innerHTML = '<li style="color:#888; font-size:1em;">No reminders set yet.</li>';
                 return;
             }
-            reminders.forEach((reminder) => {
+            reminders.forEach(reminder => {
                 const li = document.createElement('li');
                 li.className = 'reminder-item' + (reminder.taken ? ' checked' : '');
                 // Checkbox
@@ -373,49 +485,65 @@
                 checkbox.dataset.id = reminder.id;
                 checkbox.checked = reminder.taken;
                 checkbox.setAttribute('aria-label', `Mark ${reminder.name} as taken`);
-                // Info span: name, dosage, time
+
+                // Info
                 const info = document.createElement('span');
                 info.className = 'reminder-info';
-                info.textContent =
-                    `${reminder.name}` +
-                    (reminder.dosage ? ` (${reminder.dosage})` : '');
-                // Time, if provided
-                const time = reminder.time ? ` | 🕑 ${reminder.time}` : '';
+                info.textContent = `${reminder.name}` + (reminder.dosage ? ` (${reminder.dosage})` : '');
+
+                // Time display
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'reminder-time';
-                timeSpan.textContent = time;
-                // Build item
+                timeSpan.textContent = reminder.time ? ` | 🕑 ${reminder.time}` : '';
+
+                // --- EDIT Button ---
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'edit-pill-btn';
+                editBtn.textContent = '✏️';
+                editBtn.title = 'Edit reminder';
+                editBtn.dataset.id = reminder.id;
+
+                // --- DELETE Button ---
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'delete-pill-btn';
+                delBtn.textContent = '🗑️';
+                delBtn.title = 'Delete reminder';
+                delBtn.dataset.id = reminder.id;
+
+                // Build list item
                 li.appendChild(checkbox);
                 li.appendChild(info);
-                if (reminder.time) {
-                    li.appendChild(timeSpan);
-                }
+                if (reminder.time) li.appendChild(timeSpan);
+                li.appendChild(editBtn);
+                li.appendChild(delBtn);
                 LIST.appendChild(li);
             });
         }
 
-        // --- Service Worker Registration (Simple, Safe) ---
+        // --- Service Worker: Full Offline Experience ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 // Inline service worker for single-file hackathon!
                 const SW_CODE = `
-      const CACHE_NAME = 'pillbox-offline-v1';
-      self.addEventListener('install', event => {
-        event.waitUntil(
-          caches.open(CACHE_NAME).then(cache => cache.addAll([
-            location.pathname, // cache the single HTML file
-          ]))
-        );
-        self.skipWaiting();
-      });
-      self.addEventListener('fetch', event => {
-        event.respondWith(
-          caches.match(event.request).then(response => (
-            response || fetch(event.request)
-          ))
-        );
-      });
-    `;
+          const CACHE_NAME = 'pillbox-offline-v1';
+          self.addEventListener('install', event => {
+            event.waitUntil(
+              caches.open(CACHE_NAME).then(cache => cache.addAll([
+                location.pathname
+              ]))
+            );
+            self.skipWaiting();
+          });
+          self.addEventListener('fetch', event => {
+            event.respondWith(
+              caches.match(event.request).then(response => (
+                response || fetch(event.request)
+              ))
+            );
+          });
+        `;
                 const blob = new Blob([SW_CODE], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl);
