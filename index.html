@@ -37,20 +37,23 @@
             font-weight: bold;
             color: #057fa3;
             text-align: center;
+            user-select: none;
         }
 
         main {
             width: 100%;
-            max-width: 440px;
+            max-width: 960px;
             background: #fff;
             border-radius: 1rem;
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.10);
             padding: 1.5rem 1.2rem 2.5rem 1.2rem;
             margin-bottom: 2rem;
+            display: flex;
         }
 
         form {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
+            flex: 1 1 45%;
         }
 
         fieldset {
@@ -59,6 +62,9 @@
             padding: 1em;
             margin: 0;
             background: #eaf7ff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8em;
         }
 
         legend {
@@ -66,26 +72,27 @@
             color: #036ba2;
             font-size: 1.12em;
             transition: color 0.2s;
+            user-select: none;
         }
 
         label {
-            display: block;
-            margin: 0.4em 0 0.7em 0;
+            display: flex;
+            align-items: center;
             font-size: 1em;
+            gap: 0.6em;
         }
 
         input[type="text"],
         input[type="time"] {
             font-size: 1em;
             padding: 0.4em 0.6em;
-            margin-left: 0.6em;
             border: 2px solid #b7dfff;
             border-radius: 0.4em;
             outline: none;
-            width: 74%;
-            max-width: 210px;
-            transition: border-color 0.2s, background 0.2s;
+            flex: 1;
             background: #f6fcff;
+            transition: border-color 0.2s, background 0.2s;
+            min-width: 0;
         }
 
         input:focus {
@@ -105,33 +112,59 @@
             margin-bottom: 0.2em;
             transition: background 0.2s, box-shadow 0.2s;
             box-shadow: 0 2px 6px rgba(5, 127, 163, 0.15);
+            user-select: none;
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+
+        button:disabled,
+        button:disabled:hover,
+        button:disabled:focus {
+            background-color: #9eafb5;
+            color: #f0f4f6;
+            cursor: not-allowed;
+            box-shadow: none;
+            outline: none;
         }
 
         button:focus,
         button:hover {
             background: #045e7a;
-            outline: none;
+            outline: 2px solid #0a8cd2;
+            outline-offset: 2px;
         }
 
         #clear-all {
             background: #d42323;
             margin-top: 1.1em;
             font-size: 0.98em;
+            align-self: flex-start;
+            padding-left: 1.2em;
+            padding-right: 1.2em;
+            box-shadow: 0 3px 8px rgba(212, 35, 35, 0.4);
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
         #clear-all:focus,
         #clear-all:hover {
             background: #b11414;
+            box-shadow: 0 4px 12px rgba(177, 20, 20, 0.6);
         }
 
         section#reminders-section {
-            margin-top: 1.5em;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            margin-left: 2rem;
         }
 
         h2 {
             font-size: 1.23em;
             margin-bottom: 0.6em;
             color: #2479bb;
+            user-select: none;
         }
 
         ul#reminders-list {
@@ -139,6 +172,11 @@
             list-style: none;
             margin-bottom: 0.6em;
             min-height: 2.2em;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
         .reminder-item {
@@ -147,10 +185,43 @@
             background: #f3faff;
             border: 1.5px solid #b1dafd;
             border-radius: 0.45em;
-            margin-bottom: 0.57em;
             padding: 0.7em 0.8em 0.7em 0.55em;
             font-size: 1.09em;
             transition: background 0.15s;
+            gap: 0.5em;
+        }
+
+        @keyframes newItemAnim {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .reminder-item.new-item {
+            animation: newItemAnim 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .no-reminders-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #889ab2;
+            font-size: 1.05em;
+            user-select: none;
+        }
+
+        .no-reminders-message small {
+            margin-top: 0.25em;
+            font-size: 0.9em;
+            color: #a0aec0;
         }
 
         .reminder-item.checked {
@@ -163,18 +234,21 @@
             accent-color: #057fa3;
             width: 1.3em;
             height: 1.3em;
-            margin-right: 0.7em;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .reminder-info {
             flex: 1;
+            min-width: 0;
+            overflow-wrap: break-word;
         }
 
         .reminder-time {
             color: #158034;
             font-size: 0.96em;
-            margin-left: 0.6em;
+            white-space: nowrap;
+            user-select: none;
         }
 
         .edit-pill-btn,
@@ -184,16 +258,17 @@
             cursor: pointer;
             color: #036ba2;
             padding: 0.2em 0.4em;
-            margin: 0 0.2em;
             font-size: 1em;
             transition: color 0.15s, background 0.15s;
+            border-radius: 0.3em;
+            user-select: none;
+            flex-shrink: 0;
         }
 
         .edit-pill-btn:hover,
         .delete-pill-btn:hover {
             color: #FF9800;
             background: #e5f4ff;
-            border-radius: 0.3em;
         }
 
         .delete-pill-btn {
@@ -206,10 +281,10 @@
         }
 
         #toggle-dark {
-            position: absolute;
+            position: fixed;
             top: 1.5rem;
             right: 1.5rem;
-            font-size: 1.05em;
+            font-size: 1.2em;
             background: #222;
             color: #fff;
             border-radius: 0.7em;
@@ -217,17 +292,29 @@
             padding: 0.48em 0.75em;
             cursor: pointer;
             transition: background 0.16s, color 0.18s;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
         }
 
         #toggle-dark:hover {
             background: #333;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 900px) {
             main {
+                flex-direction: column;
+                max-width: 440px;
                 padding: 1.1rem 0.5rem 1.8rem 0.5rem;
             }
 
+            section#reminders-section {
+                margin-left: 0;
+                margin-top: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
             html {
                 font-size: 16px;
             }
@@ -281,6 +368,13 @@
             color: #cdf6fa;
         }
 
+        body.dark button:disabled,
+        body.dark button:disabled:hover,
+        body.dark button:disabled:focus {
+            background-color: #3a4a53;
+            color: #788a95;
+        }
+
         body.dark button#clear-all {
             background: #750e19;
         }
@@ -288,6 +382,18 @@
         body.dark button#toggle-dark {
             background: #555;
             color: #fff;
+        }
+
+        body.dark .no-reminders-message {
+            color: #8295a8;
+        }
+
+        body.dark .no-reminders-message small {
+            color: #6a7b8c;
+        }
+
+        body.dark .no-reminders-message svg {
+            color: #506477;
         }
     </style>
 </head>
@@ -304,15 +410,17 @@
                 <legend>💊 Add Medication</legend>
                 <label>
                     Name:
-                    <input type="text" id="pill-name" maxlength="50" required autocomplete="off" aria-label="Pill name">
+                    <input type="text" id="pill-name" maxlength="50" required autocomplete="off" aria-label="Pill name"
+                        placeholder="e.g. Aspirin">
                 </label>
                 <label>
                     Dosage:
-                    <input type="text" id="pill-dosage" maxlength="20" autocomplete="off" aria-label="Dosage">
+                    <input type="text" id="pill-dosage" maxlength="20" autocomplete="off" aria-label="Dosage"
+                        placeholder="e.g. 100mg">
                 </label>
                 <label>
                     Time:
-                    <input type="time" id="pill-time" aria-label="Time">
+                    <input type="time" id="pill-time" aria-label="Time" placeholder="HH:MM">
                 </label>
                 <button id="add-btn" type="submit" style="margin-top:0.7em;">
                     Add Reminder
@@ -324,7 +432,7 @@
             <h2>Today’s Medications</h2>
             <ul id="reminders-list"></ul>
             <button id="clear-all" type="button" aria-label="Clear all reminders">
-                Clear All
+                🗑️ Clear All
             </button>
         </section>
     </main>
@@ -348,6 +456,12 @@
         let editId = null; // if not null, we're editing
 
         renderReminders();
+
+        // --- UI Enhancements ---
+        ADD_BTN.disabled = NAME.value.trim() === ''; // Disable button if name is empty on load
+        NAME.addEventListener('input', () => {
+            ADD_BTN.disabled = NAME.value.trim() === '';
+        });
 
         // -- 🛎️ Notification Logic --
 
@@ -410,7 +524,7 @@
             });
             if (changed) saveReminders();
         }
-        // Poll every 60 seconds
+        // Poll every second
         setInterval(checkRemindersForNotification, 1000);
 
         // 6. Reset notifiedToday at midnight
@@ -438,7 +552,7 @@
             };
             reminders.push(reminder);
             saveReminders();
-            renderReminders();
+            return reminder;
         }
 
         // Patch form submit to use this function
@@ -464,14 +578,16 @@
                 ADD_BTN.textContent = 'Add Reminder';
             } else {
                 // --- Add new reminder ---
-                addReminderWithNotificationFlag(
+                const newReminder = addReminderWithNotificationFlag(
                     name,
                     DOSAGE.value.trim(),
                     TIME.value
                 );
+                renderReminders(newReminder.id);
             }
             FORM.reset();
             NAME.focus();
+            ADD_BTN.disabled = true;
         });
 
         // --- Mark As Taken ---
@@ -489,50 +605,64 @@
 
         // --- Delete & Edit Buttons ---
         LIST.addEventListener('click', function (e) {
+            const target = e.target;
+            const pillId = Number(target.dataset.id);
+
             // --- Delete ---
-            if (e.target.classList.contains('delete-pill-btn')) {
-                const id = Number(e.target.dataset.id);
-                if (confirm('Delete this reminder?')) {
-                    reminders = reminders.filter(r => r.id !== id);
-                    saveReminders();
-                    renderReminders();
-                }
-                // Reset edit mode if we're deleting the one being edited
-                if (editId === id) {
-                    editId = null;
-                    FORM.reset();
-                    LEGEND.textContent = '💊 Add Medication';
-                    ADD_BTN.textContent = 'Add Reminder';
+            if (target.classList.contains('delete-pill-btn')) {
+                const itemEl = target.closest('.reminder-item');
+                if (itemEl && confirm('Delete this reminder?')) {
+                    // Animate out
+                    itemEl.style.transition = 'all 0.3s ease-out';
+                    itemEl.style.opacity = '0';
+                    itemEl.style.transform = 'translateX(50px)';
+
+                    setTimeout(() => {
+                        reminders = reminders.filter(r => r.id !== pillId);
+                        saveReminders();
+                        renderReminders();
+
+                        // Reset edit mode if we're deleting the one being edited
+                        if (editId === pillId) {
+                            editId = null;
+                            FORM.reset();
+                            ADD_BTN.disabled = true;
+                            LEGEND.textContent = '💊 Add Medication';
+                            ADD_BTN.textContent = 'Add Reminder';
+                        }
+                    }, 300);
                 }
             }
             // --- Edit ---
-            else if (e.target.classList.contains('edit-pill-btn')) {
-                const id = Number(e.target.dataset.id);
-                const toEdit = reminders.find(r => r.id === id);
+            else if (target.classList.contains('edit-pill-btn')) {
+                const toEdit = reminders.find(r => r.id === pillId);
                 if (toEdit) {
                     NAME.value = toEdit.name;
                     DOSAGE.value = toEdit.dosage || '';
                     TIME.value = toEdit.time || '';
-                    editId = id;
+                    editId = pillId;
                     LEGEND.textContent = '✏️ Edit Medication';
                     ADD_BTN.textContent = 'Update Reminder';
+                    ADD_BTN.disabled = false; // Enable button for editing
                     NAME.focus();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             }
         });
 
         // --- Clear All Reminders ---
         CLEAR.addEventListener('click', function () {
-            if (confirm('Clear all reminders?')) {
+            if (reminders.length > 0 && confirm('Clear all reminders?')) {
                 reminders = [];
                 saveReminders();
                 renderReminders();
+                // Also reset edit mode, if active
+                editId = null;
+                FORM.reset();
+                ADD_BTN.disabled = true;
+                LEGEND.textContent = '💊 Add Medication';
+                ADD_BTN.textContent = 'Add Reminder';
             }
-            // Also reset edit mode, if active
-            editId = null;
-            FORM.reset();
-            LEGEND.textContent = '💊 Add Medication';
-            ADD_BTN.textContent = 'Add Reminder';
         });
 
         // --- ESC to cancel editing ---
@@ -540,6 +670,7 @@
             if (e.key === 'Escape' && editId !== null) {
                 editId = null;
                 FORM.reset();
+                ADD_BTN.disabled = true;
                 LEGEND.textContent = '💊 Add Medication';
                 ADD_BTN.textContent = 'Add Reminder';
                 NAME.focus();
@@ -557,15 +688,30 @@
         }
 
         // --- Render Reminders ---
-        function renderReminders() {
+        function renderReminders(newlyAddedId = null) {
             LIST.innerHTML = '';
             if (reminders.length === 0) {
-                LIST.innerHTML = '<li style="color:#888; font-size:1em;">No reminders set yet.</li>';
+                LIST.innerHTML = `<li class="no-reminders-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 3em; height: 3em; color: #cddbe7; margin-bottom: 0.5em;"><path d="M8 7v.01"/><path d="M16 7v.01"/><path d="M12 12.01V12"/><path d="M12 17.01V17"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            <span>Nothing scheduled yet.</span>
+            <small>Add a medication above to get started.</small>
+        </li>`;
                 return;
             }
-            reminders.forEach(reminder => {
+
+            const sortedReminders = [...reminders].sort((a, b) => {
+                if (a.time && b.time) return a.time.localeCompare(b.time);
+                if (a.time) return -1; // a has time, b doesn't -> a comes first
+                if (b.time) return 1;  // b has time, a doesn't -> b comes first
+                return a.id - b.id; // fallback to creation order
+            });
+
+            sortedReminders.forEach(reminder => {
                 const li = document.createElement('li');
                 li.className = 'reminder-item' + (reminder.taken ? ' checked' : '');
+                if (reminder.id === newlyAddedId) {
+                    li.classList.add('new-item');
+                }
                 // Checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
@@ -582,7 +728,7 @@
                 // Time display
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'reminder-time';
-                timeSpan.textContent = reminder.time ? ` | 🕑 ${reminder.time}` : '';
+                timeSpan.textContent = reminder.time ? `🕑 ${reminder.time}` : '';
 
                 // --- EDIT Button ---
                 const editBtn = document.createElement('button');
@@ -603,7 +749,7 @@
                 // Build list item
                 li.appendChild(checkbox);
                 li.appendChild(info);
-                if (reminder.time) li.appendChild(timeSpan);
+                li.appendChild(timeSpan);
                 li.appendChild(editBtn);
                 li.appendChild(delBtn);
                 LIST.appendChild(li);
